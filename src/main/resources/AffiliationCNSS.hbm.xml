@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="entities.AffiliationCNSS" table="AFF_CNSS">
+        <id name="numAffiliation" type="string">
+            <column name="NUM_AFFILIATION"/>
+        </id>
+        <property name="dateAffiliation" type="string">
+            <column name="DATE_AFFILIATION"/>
+        </property>
+        <property name="nbrPoint" type="int">
+            <column name="NUMBER_POINT"/>
+        </property>
+        <one-to-one name="emp" class="entities.Employee"/>
+    </class>
+</hibernate-mapping>

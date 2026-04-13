@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="entities.Adresse" table="ADRESSE">
+        <id name="idAdresse" type="int">
+            <column name="ID_ADRESSE"/>
+            <generator class="native"/>
+        </id>
+        <property name="adresseLigne" type="string">
+            <column name="ADRESSE_LINE"/>
+        </property>
+        <property name="ville" type="string">
+            <column name="VILLE"/>
+        </property>
+        <set name="clients" table="CLIENT_ADRESSE" inverse="true" lazy="true" cascade="all">
+            <key><column name="ID_ADRESSE"/></key>
+            <many-to-many class="entities.Client">
+                <column name="ID_CLIENT"/>
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="entities.Employee" table="EMPLOYEE">
+        <id name="id" type="int">
+            <column name="ID_EMPLOYEE"/>
+            <generator class="native"/>
+        </id>
+        <property name="name" type="string" not-null="true"><column name="NAME_EMPLOYEE"/></property>
+        <property name="salary" type="double"><column name="SALARY_EMPLOYEE"/></property>
+        <one-to-one name="affiliation" cascade="all" class="demohib1.entities.AffiliationCNSS"/>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="entities.Operation" table="OPERATION">
+        <id name="id" type="long">
+            <column name="CODE_OPERATION"/>
+            <generator class="native"/>
+        </id>
+        <property name="dateOperation" type="date"><column name="DATE_OPERATION"/></property>
+        <property name="typeOperation" type="string"><column name="TYPE_OPERATION"/></property>
+        <property name="montant" type="double"><column name="MONTANT"/></property>
+        <many-to-one name="compte" class="entities.Compte" fetch="join">
+            <column name="NUM_COMPTE"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

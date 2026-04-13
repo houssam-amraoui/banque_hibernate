@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="entities.Compte" table="COMPTE">
+        <id name="id" type="long">
+            <column name="NUM_COMPTE"/>
+            <generator class="native"/>
+        </id>
+        <discriminator type="string" column="TYPE_COMPTE"/>
+        <property name="solde" type="double"><column name="SOLDE"/></property>
+        <property name="dateCreation" type="date"><column name="DATE_CREATION"/></property>
+        <many-to-one name="client" class="entities.Client" fetch="join">
+            <column name="ID_CLIENT"/>
+        </many-to-one>
+        <set name="operations" table="OPERATION" inverse="true" lazy="true">
+            <key><column name="NUM_COMPTE"/></key>
+            <one-to-many class="entities.Operation"/>
+        </set>
+
+        <subclass name="CompteCourant" discriminator-value="CC">
+            <property name="decouvert" column="DECOUVERT"/>
+        </subclass>
+
+        <subclass name="entities.CompteEpargne" discriminator-value="CE">
+            <property name="taux" column="TAUX_INTERET"/>
+        </subclass>
+    </class>
+</hibernate-mapping>
