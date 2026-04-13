@@ -84,86 +84,76 @@ public class TestDao {
 
         session.getTransaction().commit();
 
-        // read and print all entities ordered by id
+        // read and print relation graphs:
+        // 1) client and everything related to it
+        // 2) employee and everything related to it
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
-        System.out.println("========== ADRESSES ==========");
-        List<Adresse> adresses = session
-                .createQuery("from Adresse a order by a.idAdresse", Adresse.class)
-                .list();
-        adresses.forEach(a -> System.out.println(
-                "Adresse{id=" + a.getIdAdresse()
-                        + ", ligne='" + a.getAdresseLigne() + '\''
-                        + ", ville='" + a.getVille() + "'}"
-        ));
-
-        System.out.println("========== CLIENTS ==========");
+        System.out.println("========== CLIENT GRAPH (Client + Adresse + Comptes + Operations) ==========");
         List<Client> clients = session
                 .createQuery("from Client c order by c.id", Client.class)
                 .list();
-        clients.forEach(client -> System.out.println(
-                "Client{id=" + client.getId()
-                        + ", nom='" + client.getFirstName() + " " + client.getLastName() + '\''
-                        + ", dateNaissance=" + sdf.format(client.getDateNaissance())
-                        + ", adresseVille='" + client.getAdresse().getVille() + "'}"
-        ));
+        clients.forEach(client -> {
+            System.out.println("Client{id=" + client.getId()
+                    + ", nom='" + client.getFirstName() + " " + client.getLastName() + '\''
+                    + ", dateNaissance=" + sdf.format(client.getDateNaissance())
+                    + "}");
 
-        System.out.println("========== COMPTES ==========");
-        List<Compte> comptes = session
-                .createQuery("from Compte cp order by cp.id", Compte.class)
-                .list();
-        comptes.forEach(cp -> {
-            String details = "Compte{id=" + cp.getId()
-                    + ", type=" + cp.getClass().getSimpleName()
-                    + ", solde=" + cp.getSolde()
-                    + ", dateCreation=" + cp.getDateCreation()
-                    + ", clientId=" + (cp.getClient() != null ? cp.getClient().getId() : null);
-            if (cp instanceof CompteCourant) {
-                details += ", decouvert=" + ((CompteCourant) cp).getDecouvert();
-            } else if (cp instanceof CompteEpargne) {
-                details += ", taux=" + ((CompteEpargne) cp).getTaux();
+            Adresse a = client.getAdresse();
+            if (a != null) {
+                System.out.println("  Adresse{id=" + a.getIdAdresse()
+                        + ", ligne='" + a.getAdresseLigne() + '\''
+                        + ", ville='" + a.getVille() + "'}");
             }
-            details += "}";
-            System.out.println(details);
+
+            client.getComptes().stream()
+                    .sorted((c1, c2) -> Long.compare(c1.getId(), c2.getId()))
+                    .forEach(cp -> {
+                        String compteDetails = "  Compte{id=" + cp.getId()
+                                + ", type=" + cp.getClass().getSimpleName()
+                                + ", solde=" + cp.getSolde()
+                                + ", dateCreation=" + cp.getDateCreation();
+                        if (cp instanceof CompteCourant) {
+                            compteDetails += ", decouvert=" + ((CompteCourant) cp).getDecouvert();
+                        } else if (cp instanceof CompteEpargne) {
+                            compteDetails += ", taux=" + ((CompteEpargne) cp).getTaux();
+                        }
+                        compteDetails += "}";
+                        System.out.println(compteDetails);
+
+                        cp.getOperations().stream()
+                                .sorted((o1, o2) -> Long.compare(o1.getId(), o2.getId()))
+                                .forEach(o -> System.out.println(
+                                        "    Operation{id=" + o.getId()
+                                                + ", type='" + o.getTypeOperation() + '\''
+                                                + ", montant=" + o.getMontant()
+                                                + ", dateOperation=" + o.getDateOperation()
+                                                + "}"
+                                ));
+                    });
+            System.out.println();
         });
 
-        System.out.println("========== OPERATIONS ==========");
-        List<Operation> operations = session
-                .createQuery("from Operation o order by o.id", Operation.class)
-                .list();
-        operations.forEach(o -> System.out.println(
-                "Operation{id=" + o.getId()
-                        + ", type='" + o.getTypeOperation() + '\''
-                        + ", montant=" + o.getMontant()
-                        + ", dateOperation=" + o.getDateOperation()
-                        + ", compteId=" + (o.getCompte() != null ? o.getCompte().getId() : null)
-                        + "}"
-        ));
-
-        System.out.println("========== EMPLOYEES ==========");
+        System.out.println("========== EMPLOYEE GRAPH (Employee + AffiliationCNSS) ==========");
         List<Employee> employees = session
                 .createQuery("from Employee e order by e.id", Employee.class)
                 .list();
-        employees.forEach(e -> System.out.println(
-                "Employee{id=" + e.getId()
-                        + ", name='" + e.getName() + '\''
-                        + ", salary=" + e.getSalary()
-                        + ", affiliation=" + (e.getAffiliation() != null ? e.getAffiliation().getNumAffiliation() : null)
-                        + "}"
-        ));
+        employees.forEach(e -> {
+            System.out.println("Employee{id=" + e.getId()
+                    + ", name='" + e.getName() + '\''
+                    + ", salary=" + e.getSalary()
+                    + "}");
 
-        System.out.println("========== AFFILIATIONS CNSS ==========");
-        List<AffiliationCNSS> affiliations = session
-                .createQuery("from AffiliationCNSS a order by a.numAffiliation", AffiliationCNSS.class)
-                .list();
-        affiliations.forEach(a -> System.out.println(
-                "AffiliationCNSS{num='" + a.getNumAffiliation() + '\''
+            AffiliationCNSS a = e.getAffiliation();
+            if (a != null) {
+                System.out.println("  AffiliationCNSS{num='" + a.getNumAffiliation() + '\''
                         + ", date='" + a.getDateAffiliation() + '\''
                         + ", points=" + a.getNbrPoint()
-                        + ", employeeId=" + (a.getEmp() != null ? a.getEmp().getId() : null)
-                        + "}"
-        ));
+                        + "}");
+            }
+            System.out.println();
+        });
 
         session.getTransaction().commit();
     }
