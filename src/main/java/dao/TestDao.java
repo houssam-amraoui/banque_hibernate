@@ -11,17 +11,20 @@ public class TestDao {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
-        Adresse adresse = new Adresse("123 Rue Principale", "Rabat");
+        //save adresse
+        Adresse adresse = new Adresse("hay elhassania", "sale");
         session.save(adresse);
 
+        //save client
         Client c = new Client();
         c.setFirstName("houssam");
         c.setLastName("amraoui");
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        c.setDateNaissance(sdf.parse("24/04/1999"));
+        c.setDateNaissance(sdf.parse("17/04/1999"));
         c.setAdresse(adresse);
         session.save(c);
 
+        //save compte
         CompteCourant compte = new CompteCourant();
         compte.setSolde(1000);
         compte.setDecouvert(500);
@@ -30,9 +33,19 @@ public class TestDao {
         c.getComptes().add(compte);
         session.save(compte);
 
+        //save operation versement
         Operation op = new Operation();
         op.setTypeOperation("Versement");
         op.setMontant(200);
+        op.setDateOperation(new Date());
+        op.setCompte(compte);
+        compte.getOperations().add(op);
+        session.save(op);
+
+        //save operation retrait
+        Operation op = new Operation();
+        op.setTypeOperation("retrait");
+        op.setMontant(-300);
         op.setDateOperation(new Date());
         op.setCompte(compte);
         compte.getOperations().add(op);

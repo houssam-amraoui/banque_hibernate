@@ -23,7 +23,7 @@ public abstract class Compte {
     protected Client client;
 
     @OneToMany(mappedBy = "compte", cascade = CascadeType.ALL)
-    protected Set<Operation> operations = new HashSet<>();
+    protected ArrayList<Operation> operations = new ArrayList<>();
 
     public Compte() {}
 
@@ -40,5 +40,5 @@ public abstract class Compte {
     public void setClient(Client client) { this.client = client; }
 
     public Set<Operation> getOperations() { return operations; }
-    public void setOperations(Set<Operation> operations) { this.operations = operations; }
+    public void setOperations(ArrayList<Operation> operations) { this.operations = new HashSet<>(operations); }
 }
